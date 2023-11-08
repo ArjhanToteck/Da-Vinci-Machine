@@ -38,6 +38,7 @@
 	Rows: <input id="rowsInput" onchange="renderGrid()" type="number" style="width: 5em" value="100" />
 
 	<br>
+	<br>
 
 	Columns:<input id="columnsInput" onchange="renderGrid()" type="number" style="width: 5em" value="50" />
 
@@ -51,9 +52,23 @@
 </div>
 
 <div id="lineDensityMenu" style="display:none">
-	
+
 	Minimum line density: <input id="minLineDensityInput" onchange="generateLines()" type="number" style="width: 5em" value="0" />
+
+	<br>
+	<br>
+
 	Maximum line density: <input id="maxLineDensityInput" onchange="generateLines()" type="number" style="width: 5em" value="10" />
+
+	<br>
+	<br>
+
+	Horizontal lines: <input id="horizontalLinesInput" onchange="generateLines()" type="checkbox" checked />
+
+	<br>
+	<br>
+
+	Vertical lines: <input id="verticalLinesInput" onchange="generateLines()" type="checkbox" checked />
 
 	<br>
 	<br>
@@ -79,7 +94,8 @@
 	const lineDensityMenu = document.getElementById("lineDensityMenu");
 	const minLineDensityInput = document.getElementById("minLineDensityInput");
 	const maxLineDensityInput = document.getElementById("maxLineDensityInput");
-
+	const horizontalLinesInput = document.getElementById("horizontalLinesInput");
+	const verticalLinesInput = document.getElementById("verticalLinesInput");
 
 	const canvas = document.getElementById("canvas");
 	const context = canvas.getContext("2d");
@@ -234,11 +250,21 @@
 
 				// loop through lines
 				for (let i = 0; i < cellLineCount; i++) {
-					// draw dashed line
-					context.beginPath();
-					context.moveTo((i * lineDistance) + (x * cellWidth), y * cellHeight);
-					context.lineTo(i * lineDistance + (x * cellWidth), (y * cellHeight) + cellHeight);
-					context.stroke();
+					// draw lines
+
+					if (verticalLinesInput.checked) {
+						context.beginPath();
+						context.moveTo((i * lineDistance) + (x * cellWidth), y * cellHeight);
+						context.lineTo((i * lineDistance) + (x * cellWidth), (y * cellHeight) + cellHeight);
+						context.stroke();
+					}
+
+					if (horizontalLinesInput.checked) {
+						context.beginPath();
+						context.moveTo(x * cellWidth, (i * lineDistance) + (y * cellHeight));
+						context.lineTo((x * cellWidth) + cellWidth, (i * lineDistance) + (y * cellHeight));
+						context.stroke();
+					}
 				}
 			}
 
