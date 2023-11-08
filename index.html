@@ -73,10 +73,14 @@
 	<br>
 	<br>
 
-	<button onclick="downloadGcode()">Next</button>
+	<button onclick="submitLines()">Next</button>
 
 	<br>
 	<br>
+</div>
+
+<div id="physicalSettingsMenu">
+	TODO: put physical settings here and then generate and download gcode
 </div>
 
 <canvas id="canvas" style="display:none;"></canvas>
@@ -97,11 +101,14 @@
 	const horizontalLinesInput = document.getElementById("horizontalLinesInput");
 	const verticalLinesInput = document.getElementById("verticalLinesInput");
 
+	const physicalSettingsMenu = document.getElementById("physicalSettingsMenu");
+
 	const canvas = document.getElementById("canvas");
 	const context = canvas.getContext("2d");
 
 	let image = new Image();
-	let cellLineCounts = []
+	let verticalLinesData = [];
+	let horizontalLinesData = []
 
 	imageInput.addEventListener('change', function (event) {
 		// load image
@@ -226,7 +233,10 @@
 
 		// draw cells
 		for (let y = 0; y < rows; y++) {
-			cellLineCounts.push([])
+			
+			// create empty array for row in linesData arrays
+			horizontalLinesData.push([]);
+			verticalLinesData.push([]);
 
 			for (let x = 0; x < columns; x++) {
 				// scale brightness by factors of brightest and darkest values
@@ -241,32 +251,83 @@
 
 				// translate brightness to number of lines
 				cellLineCount = Math.round((cellBrigthnesses[y][x] * (maxLineDensity - minLineDensity)) + minLineDensity);
-				cellLineCounts[y].push(cellLineCount);
 
 				// draw lines in cell
 
 				// calculate line distance
 				let lineDistance = cellWidth / cellLineCount;
+				
+				// create empty array for cell in linesData arrays
+				horizontalLinesData[y].push([]);
+				verticalLinesData[y].push([]);
 
 				// loop through lines
 				for (let i = 0; i < cellLineCount; i++) {
 					// draw lines
+					
+					// horizontal
+					if (horizontalLinesInput.checked) {
+						// create line
+						startPoint = [x * cellWidth, (i * lineDistance) + (y * cellHeight)];
+						endPoint = [(x * cellWidth) + cellWidth, (i * lineDistance) + (y * cellHeight)];
+						line = new Line(startPoint, endPoint, Line.directions.horizontal);
+						horizontalLinesData[y][x].push(line);
+						
 
-					if (verticalLinesInput.checked) {
+						// draw line
 						context.beginPath();
-						context.moveTo((i * lineDistance) + (x * cellWidth), y * cellHeight);
-						context.lineTo((i * lineDistance) + (x * cellWidth), (y * cellHeight) + cellHeight);
+						context.moveTo(...startPoint);
+						context.lineTo(...endPoint);
 						context.stroke();
 					}
 
-					if (horizontalLinesInput.checked) {
+					// vertical
+					if (verticalLinesInput.checked) {
+						// create line
+						startPoint = [(i * lineDistance) + (x * cellWidth), y * cellHeight];
+						endPoint = [(i * lineDistance) + (x * cellWidth), (y * cellHeight) + cellHeight];
+						line = new Line(startPoint, endPoint, Line.directions.vertical);
+						verticalLinesData[y][x].push(line);
+
+						// draw line
 						context.beginPath();
-						context.moveTo(x * cellWidth, (i * lineDistance) + (y * cellHeight));
-						context.lineTo((x * cellWidth) + cellWidth, (i * lineDistance) + (y * cellHeight));
+						context.moveTo(...startPoint);
+						context.lineTo(...endPoint);
 						context.stroke();
 					}
 				}
 			}
 		}
 	}
+
+	// line constructor
+	function Line(startPoint, endPoint, direction){
+		this.startPoint = startPoint;
+		this.endPoint = endPoint;
+		this.direction = direction;
+	}
+
+	// static directions enum
+	Line.directions = {
+		horizontal: 0,
+		vertical: 1
+	};
+
+	
+	function submitLines() {
+		// hide and display menus
+		lineDensityMenu.style.display = "none";
+		physicalSettingsMenu.style.display = "block";
+
+		// right now, there are a bunch of redundant lines, we need to combine them
+		joinLines();
+	}
+
+	function joinLines(){
+		// horizontal lines
+		for(let i = 0; i < horizontalLinesData.length; i++){
+			// TODO: check every other cell in row to see if endpoint matches startpoint to combine lines
+		}
+	}
+	
 </script>
