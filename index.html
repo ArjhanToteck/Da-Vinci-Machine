@@ -61,4 +61,123 @@
 
 <h1 class="glitch" data-text="Da Vinci Machine">Da Vinci Machine</h1>
 
-<input type="file" id="myfile" name="myfile">
+<div id="imageInputMenu">
+
+	Click here or drag an image file here to begin: <input id="imageInput" type="file" accept="image/*">
+
+	<br>
+	<br>
+
+	<button onclick="submitImage()">Next</button>
+
+</div>
+
+<div id="gridMenu" style="display:none">
+
+	Rows: <input id="rowsInput" onchange="renderGrid()" type="number" style="width: 5em" value="100" />
+
+	<br>
+
+	Columns:<input id="columnsInput" onchange="renderGrid()" type="number" style="width: 5em" value="50" />
+
+	<br>
+	<br>
+
+	<button onclick="submitGrid()">Next</button>
+
+	<br>
+	<br>
+</div>
+
+<div id="lineDensityMenu" style="display:none">
+
+	Max line density: <input id="lineDensityInput" onchange="generateLines()" type="number" style="width: 5em" value="10" />
+
+	<br>
+	<br>
+
+	<button onclick="downloadGcode()">Next</button>
+
+	<br>
+	<br>
+</div>
+
+<canvas id="canvas" style="display:none; max-width:60%; max-height:60%;"></canvas>
+
+<script>
+	// TODO: add a way to go back through menus
+
+	const imageInputMenu = document.getElementById("imageInputMenu");
+	const imageInput = document.getElementById("imageInput");
+
+	const gridMenu = document.getElementById("gridMenu");
+	const rowsInput = document.getElementById("rowsInput");
+	const columnsInput = document.getElementById("columnsInput");
+
+	const canvas = document.getElementById("canvas");
+	const context = canvas.getContext("2d");
+
+	let image = new Image();
+
+	imageInput.addEventListener('change', function (event) {
+		// load image
+		image.src = URL.createObjectURL(event.target.files[0]);
+	});
+
+	function submitImage() {
+		// hide and display menus
+		imageInputMenu.style.display = "none";
+		gridMenu.style.display = "block";
+		canvas.style.display = "block";
+
+		renderGrid();
+	}
+
+	function renderGrid() {
+		// set canvas dimensions
+		canvas.width = image.width;
+		canvas.height = image.height;
+
+		// draw image on canvas
+		context.drawImage(image, 0, 0, image.width, image.height);
+
+		// draw grid
+		rows = parseInt(rowsInput.value, 10);
+		rowHeight = image.height / rows;
+
+		columns = parseInt(columnsInput.value, 10);
+		columnWidth = image.width / columns;
+
+		// draw rows
+		for (let i = 0; i < rows; i++) {
+			// draw dashed line
+			context.beginPath();
+			context.moveTo(0, i * rowHeight);
+			context.lineTo(image.width, i * rowHeight);
+			context.strokeStyle = "#fc03f4";
+			context.stroke();
+		}
+
+		// draw columns
+		for (let i = 0; i < rows; i++) {
+			// draw dashed line
+			context.beginPath();
+			context.moveTo(i * columnWidth, 0);
+			context.lineTo(i * columnWidth, image.height);
+			context.strokeStyle = "#fc03f4";
+			context.stroke();
+		}
+	}
+
+	function submitGrid() {
+		// hide and display menus
+		gridMenu.style.display = "none";
+		lineDensityMenu.style.display = "block";
+
+		generateLines();
+	}
+
+	function generateLines() {
+		// TODO: generate lines and draw a sample line image
+	}
+</script>
