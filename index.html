@@ -18,45 +18,6 @@
 	<title>Da Vinci Machine | ArjhanToteck</title>
 	<link href="/style.css" rel="stylesheet" type="text/css" media="all">
 	<link rel="icon" href="/favicon.png">
-
-	<style>
-		.audioContainer {
-			width: 75%;
-			background-color: gray;
-			border-radius: 4px;
-		}
-
-		.audioProgress,
-		.audioSegment {
-			width: 0px;
-			height: 20px;
-			border-radius: 4px;
-			text-align: center;
-			line-height: 30px;
-			font-weight: bold;
-			transition: width 0.3s ease-in-out;
-		}
-
-		.audioProgress {
-			position: absolute;
-			background-color: white;
-		}
-
-		.audioSegment {
-			background-color: #c2c2c2;
-		}
-
-		.audioProgressText {
-			margin-top: 5px;
-			font-size: 12px;
-		}
-
-		.highlight {
-			background-color: white;
-			color: #262626;
-			border-radius: 5px;
-		}
-	</style>
 </head>
 
 <h1 class="glitch" data-text="Da Vinci Machine">Da Vinci Machine</h1>
@@ -90,8 +51,9 @@
 </div>
 
 <div id="lineDensityMenu" style="display:none">
-
-	Max line density: <input id="lineDensityInput" onchange="generateLines()" type="number" style="width: 5em" value="10" />
+	
+	Minimum line density: <input id="minLineDensityInput" onchange="generateLines()" type="number" style="width: 5em" value="0" />
+	Maximum line density: <input id="maxLineDensityInput" onchange="generateLines()" type="number" style="width: 5em" value="25" />
 
 	<br>
 	<br>
@@ -114,10 +76,16 @@
 	const rowsInput = document.getElementById("rowsInput");
 	const columnsInput = document.getElementById("columnsInput");
 
+	const lineDensityMenu = document.getElementById("lineDensityMenu");
+	const minLineDensityInput = document.getElementById("minLineDensityInput");
+	const maxLineDensityInput = document.getElementById("maxLineDensityInput");
+
+
 	const canvas = document.getElementById("canvas");
 	const context = canvas.getContext("2d");
 
 	let image = new Image();
+	let cellLineCounts = []
 
 	imageInput.addEventListener('change', function (event) {
 		// load image
@@ -143,17 +111,17 @@
 
 		// draw grid
 		rows = parseInt(rowsInput.value, 10);
-		rowHeight = image.height / rows;
+		cellHeight = image.height / rows;
 
 		columns = parseInt(columnsInput.value, 10);
-		columnWidth = image.width / columns;
+		cellWidth = image.width / columns;
 
 		// draw rows
 		for (let i = 0; i < rows; i++) {
 			// draw dashed line
 			context.beginPath();
-			context.moveTo(0, i * rowHeight);
-			context.lineTo(image.width, i * rowHeight);
+			context.moveTo(0, i * cellHeight);
+			context.lineTo(image.width, i * cellHeight);
 			context.strokeStyle = "#fc03f4";
 			context.stroke();
 		}
@@ -162,8 +130,8 @@
 		for (let i = 0; i < rows; i++) {
 			// draw dashed line
 			context.beginPath();
-			context.moveTo(i * columnWidth, 0);
-			context.lineTo(i * columnWidth, image.height);
+			context.moveTo(i * cellWidth, 0);
+			context.lineTo(i * cellWidth, image.height);
 			context.strokeStyle = "#fc03f4";
 			context.stroke();
 		}
@@ -178,6 +146,107 @@
 	}
 
 	function generateLines() {
+		// draw image on canvas for processing
+		context.drawImage(image, 0, 0, image.width, image.height);
+
+		maxLineDensity = parseInt(maxLineDensityInput.value, 10);
+		minLineDensity = parseInt(minLineDensityInput.value, 10);
+
+		// get grid info
+		rows = parseInt(rowsInput.value, 10);
+		cellHeight = image.height / rows;
+
+		columns = parseInt(columnsInput.value, 10);
+		cellWidth = image.width / columns;
+
+		// brightness variables
+		cellBrigthnesses = [];
+		brightestValue = 1;
+		darkestValue = 0;
+
+		// loop through every grid cell
+		for (let y = 0; y < rows; y++) {
+			cellBrigthnesses.push([])
+
+			for (let x = 0; x < columns; x++) {
+				// get cell image data
+				let imageData = context.getImageData(x * cellWidth, y * cellHeight, cellWidth, cellHeight).data;
+
+				// calculate average cell brightness
+				let cellBrightness = 0;
+
+				for (let i = 0; i < imageData.length; i += 4) {
+					// RGB at i, i+1, and i+2
+					let pixelBrightness = (imageData[i] + imageData[i + 1] + imageData[i + 2]) / 3;
+					cellBrightness += pixelBrightness;
+				}
+
+				// get average for cell (divide by number of pixels in cell)
+				cellBrightness /= imageData.length;
+
+				// scale brightness from 0-1
+				cellBrightness /= 255;
+
+				// flip scale (lightest is 0, darkest is 1)
+				cellBrightness = 1 - cellBrightness;
+
+				// check if brightest value
+				if (cellBrightness < brightestValue) {
+					brightestValue = cellBrightness;
+				}
+
+				// check if darkest value
+				if (cellBrightness > darkestValue) {
+					darkestValue = cellBrightness;
+				}
+
+				cellBrigthnesses[y].push(cellBrightness);
+			}
+		}
+
+		// clear canvas for drawing
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.strokeStyle = "#000000";
+
+		// draw cells
+		for (let y = 0; y < rows; y++) {
+			cellLineCounts.push([])
+
+			for (let x = 0; x < columns; x++) {
+				// scale brightness by factors of brightest and darkest values
+
+				// check for all values being the same
+				if (darkestValue == brightestValue) {
+					cellBrigthnesses[y][x] = 0.5;
+				} else {
+					// scale to a number of lines
+					cellBrigthnesses[y][x] = (cellBrigthnesses[y][x] - brightestValue) / (darkestValue - brightestValue);
+				}
+
+				// translate brightness to number of lines
+				cellLineCount = Math.round((cellBrigthnesses[y][x] * (maxLineDensity - minLineDensity)) + minLineDensity);
+				cellLineCounts[y].push(cellLineCount);
+
+				// draw lines in cell
+
+				// calculate line distance
+				let lineDistance = cellWidth / cellLineCount;
+
+				// loop through lines
+				for (let i = 0; i < cellLineCount; i++) {
+					// draw dashed line
+					context.beginPath();
+					context.moveTo((i * lineDistance) + (x * cellWidth), y * cellHeight);
+					context.lineTo(i * lineDistance + (x * cellWidth), (y * cellHeight) + cellHeight);
+					context.stroke();
+				}
+			}
+
+
+		}
+
 		// TODO: generate lines and draw a sample line image
+
+
 	}
 </script>
