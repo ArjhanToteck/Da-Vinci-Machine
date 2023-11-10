@@ -530,7 +530,9 @@
 		gcodeFile += "M140 S0 ; turn off bed heat\n";
 		gcodeFile += "G21 ; set units to millimeters\n";
 		gcodeFile += "G90 ; use absolute coordinates\n\n";
-		gcodeFile += "G28 ; home all axes\n";
+
+		// go to home
+		gcodeFile += "G28 ; home all axes\n\n";
 
 		// load parameters
 		let physicalSize = [parseFloat(physicalWidthInput.value), parseFloat(physicalHeightInput.value)];
@@ -568,7 +570,7 @@
 			lineEnd[1] = lineEnd[1].toFixed(1);
 			
 			// lift pen (with z offset)
-			gcodeFile += `G0 Z${(1 + offsets[2]).toFixed(1)}; lift pen\n`;
+			gcodeFile += `G0 Z${(5 + offsets[2]).toFixed(1)}; lift pen\n`;
 
 			// go to line start
 			gcodeFile += `G0 X${lineStart[0]} Y${lineStart[1]}; start line\n`;
@@ -581,7 +583,7 @@
 		}
 
 		// lift pen and go home at the end
-		gcodeFile += "G0 Z4; lift pen\n";
+		gcodeFile += `G0 Z${(5 + offsets[2]).toFixed(1)}; lift pen\n`;
 		gcodeFile += "G28 ; home all axes\n";
 
 		// set text area to gcode
