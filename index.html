@@ -80,12 +80,12 @@
 </div>
 
 <div id="physicalSettingsMenu" style="display:none">
-	Physical width (mm): <input id="physicalWidthInput" onchange="setPhysicalDimensions(this)" type="number" style="width: 7em" value="190" />
+	Physical width (mm): <input id="physicalWidthInput" onchange="setPhysicalDimensions(this)" type="number" style="width: 7em" value="175" />
 
 	<br>
 	<br>
 
-	Physical height (mm): <input id="physicalHeightInput" onchange="setPhysicalDimensions(this)" type="number" style="width: 7em" value="190" />
+	Physical height (mm): <input id="physicalHeightInput" onchange="setPhysicalDimensions(this)" type="number" style="width: 7em" value="175" />
 
 	<br>
 	<br>
@@ -147,7 +147,7 @@
 	const canvas = document.getElementById("canvas");
 	const context = canvas.getContext("2d");
 
-	const defaultPhysicalSize = 190;
+	const defaultPhysicalSize = 175;
 
 	let image = new Image();
 	let verticalLinesData = [];
