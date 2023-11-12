@@ -536,10 +536,10 @@
 		// load parameters
 		let physicalSize = [parseFloat(physicalWidthInput.value), parseFloat(physicalHeightInput.value)];
 		let proportions = [(physicalSize[0] / image.width), physicalSize[1] / image.height];
-		let offsets = [parseFloat(xOffsetInput.value), parseFloat(yOffsetInput.value), parseFloat(zOffsetInput.value)]
+		let offsets = [parseFloat(xOffsetInput.value), parseFloat(yOffsetInput.value), parseFloat(zOffsetInput.value)];
 
 		// remember pen position (screen space)
-		let penPosition = []
+		let penPosition = [0, 0];
 
 		// loop through lines
 		for (let i = 0; i < combinedLinesData.length; i++){
