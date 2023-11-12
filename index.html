@@ -549,26 +549,7 @@
 			let lineStart = Array.from(currentLine.startPoint);
 			let lineEnd = Array.from(currentLine.endPoint);
 
-			// draw as the ox plows
-			if (currentLine.direction == Line.directions.horizontal) {
-				// check if pen is already at the same x as end of the line (in screen space)
-				if (penPosition[0] == lineEnd[0]) {
-					// flip line start and end to avoid uneccessary movement
-					[lineStart, lineEnd] = [lineEnd, lineStart]
-				}
-			}
-			// TODO: vertical lines are a little wonky rn, fix that before being able to draw vertical lines as the ox plows
-			else if (currentLine.direction == Line.directions.vertical) {
-				// check if pen is already at the same y as end of the line (in screen space)
-				if (penPosition[1] == lineEnd[1]) {
-					// flip line start and end to avoid uneccessary movement
-					[lineStart, lineEnd] = [lineEnd, lineStart]
-				}
-			}
-
-
-			// remember pen position (screen space)
-			penPosition = Array.from(lineEnd);
+			// screen position to printer position conversion
 
 			// convert to physical size
 			lineStart[0] *= proportions[0];
@@ -591,6 +572,16 @@
 			lineStart[1] = lineStart[1].toFixed(1);
 			lineEnd[0] = lineEnd[0].toFixed(1);
 			lineEnd[1] = lineEnd[1].toFixed(1);
+
+			// set to draw as the ox plows
+
+			// check whether if lineEnd is closer to pen
+			if (pointDistance(penPosition, lineEnd)) {
+				// flip line start and end to avoid uneccessary movement
+				[lineStart, lineEnd] = [lineEnd, lineStart];
+			}
+
+			// actually draw line
 			
 			// lift pen (with z offset)
 			gcodeFile += `G0 Z${(5 + offsets[2]).toFixed(1)}; lift pen\n`;
@@ -603,6 +594,9 @@
 			
 			// go to line end
 			gcodeFile += `G0 X${lineEnd[0]} Y${lineEnd[1]}; end line\n\n`;
+
+			// remember pen position (screen space)
+			penPosition = Array.from(lineEnd);
 		}
 
 		// lift pen and go home at the end
@@ -611,6 +605,16 @@
 
 		// set text area to gcode
 		gcodeTextarea.value = gcodeFile;
+	}
+
+	function pointDistance(point1, point2) {
+		const x1 = point1[0];
+		const y1 = point1[1];
+		const x2 = point2[0];
+		const y2 = point2[1];
+
+		const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+		return distance;
 	}
 
 	function downloadGcode() {
