@@ -576,7 +576,7 @@
 			// set to draw as the ox plows
 
 			// check whether if lineEnd is closer to pen
-			if (pointDistance(penPosition, lineEnd)) {
+			if (pointDistance(penPosition, lineEnd) < pointDistance(penPosition, lineStart)) {
 				// flip line start and end to avoid uneccessary movement
 				[lineStart, lineEnd] = [lineEnd, lineStart];
 			}
