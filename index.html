@@ -35,12 +35,12 @@
 
 <div id="gridMenu" style="display:none">
 
-	Rows: <input id="rowsInput" onchange="renderGrid()" type="number" style="width: 5em" value="150" />
+	Rows: <input id="rowsInput" onchange="renderGrid()" type="number" style="width: 5em" value="100" />
 
 	<br>
 	<br>
 
-	Columns:<input id="columnsInput" onchange="renderGrid()" type="number" style="width: 5em" value="150" />
+	Columns:<input id="columnsInput" onchange="renderGrid()" type="number" style="width: 5em" value="100" />
 
 	<br>
 	<br>
@@ -58,7 +58,7 @@
 	<br>
 	<br>
 
-	Maximum line density: <input id="maxLineDensityInput" onchange="generateLines()" type="number" style="width: 5em" value="8" />
+	Maximum line density: <input id="maxLineDensityInput" onchange="generateLines()" type="number" style="width: 5em" value="4" />
 
 	<br>
 	<br>
@@ -150,6 +150,8 @@
 	const defaultPhysicalSize = 175;
 
 	let image = new Image();
+	let rows = 0;
+	let columns = 0;
 	let verticalLinesData = [];
 	let horizontalLinesData = [];
 	let combinedLinesData = [];
@@ -179,10 +181,10 @@
 		context.drawImage(image, 0, 0, image.width, image.height);
 
 		// draw grid
-		rows = parseFloat(rowsInput.value);
+		rows = parseInt(rowsInput.value, 10);
 		cellHeight = image.height / rows;
 
-		columns = parseFloat(columnsInput.value);
+		columns = parseInt(columnsInput.value, 10);
 		cellWidth = image.width / columns;
 
 		// draw rows
@@ -226,11 +228,8 @@
 		maxLineDensity = parseInt(maxLineDensityInput.value, 10);
 		minLineDensity = parseInt(minLineDensityInput.value, 10);
 
-		// get grid info
-		rows = parseInt(rowsInput.value, 10);
+		// get cell info
 		cellHeight = image.height / rows;
-
-		columns = parseInt(columnsInput.value, 10);
 		cellWidth = image.width / columns;
 
 		// brightness variables
@@ -384,8 +383,8 @@
 		// horizontal lines
 
 		// loop through cells
-		for (let y = 0; y < horizontalLinesData.length; y++) {
-			for (let x = 0; x < horizontalLinesData[y].length; x++) {
+		for (let y = 0; y < rows; y++) {
+			for (let x = 0; x < columns; x++) {
 
 				// loop through lines
 				for (let lineIndex = 0; lineIndex < horizontalLinesData[y][x].length; lineIndex++) {
@@ -437,10 +436,10 @@
 		}
 
 		// vertical lines
-		// TODO: vertical line drawing is a little wonky rn. fix this
+
 		// loop through cells
-		for (let y = 0; y < verticalLinesData.length; y++) {
-			for (let x = 0; x < verticalLinesData[y].length; x++) {
+		for (let x = 0; x < columns; x++) {
+			for (let y = 0; y < rows; y++) {
 
 				// loop through lines
 				for (let lineIndex = 0; lineIndex < verticalLinesData[y][x].length; lineIndex++) {
@@ -457,7 +456,7 @@
 					let combinedLine = new Line(Array.from(line.startPoint), Array.from(line.endPoint), Line.directions.vertical, true);
 
 					// loop through cells below
-					for (let cellBelow = y + 1; cellBelow < verticalLinesData.length; cellBelow++) {
+					for (let cellBelow = y + 1; cellBelow < rows; cellBelow++) {
 						let matchFound = false;
 
 						// loop through lines
@@ -480,7 +479,7 @@
 
 						// if there aren't any matches in this cell, we can stop looking through cells on the right
 						if (!matchFound) {
-							cellBelow = verticalLinesData.length;
+							cellBelow = rows;
 							break;
 						}
 					}
@@ -559,13 +558,13 @@
 				}
 			}
 			// TODO: vertical lines are a little wonky rn, fix that before being able to draw vertical lines as the ox plows
-			/*else if (currentLine.direction == Line.directions.vertical) {
+			else if (currentLine.direction == Line.directions.vertical) {
 				// check if pen is already at the same y as end of the line (in screen space)
 				if (penPosition[1] == lineEnd[1]) {
 					// flip line start and end to avoid uneccessary movement
 					[lineStart, lineEnd] = [lineEnd, lineStart]
 				}
-			}*/
+			}
 
 
 			// remember pen position (screen space)
