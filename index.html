@@ -437,7 +437,7 @@
 		}
 
 		// vertical lines
-
+		// TODO: vertical line drawing is a little wonky rn. fix this
 		// loop through cells
 		for (let y = 0; y < verticalLinesData.length; y++) {
 			for (let x = 0; x < verticalLinesData[y].length; x++) {
@@ -539,6 +539,9 @@
 		let proportions = [(physicalSize[0] / image.width), physicalSize[1] / image.height];
 		let offsets = [parseFloat(xOffsetInput.value), parseFloat(yOffsetInput.value), parseFloat(zOffsetInput.value)]
 
+		// remember pen position (screen space)
+		let penPosition = []
+
 		// loop through lines
 		for (let i = 0; i < combinedLinesData.length; i++){
 			let currentLine = combinedLinesData[i];
@@ -546,6 +549,27 @@
 			// get line points
 			let lineStart = Array.from(currentLine.startPoint);
 			let lineEnd = Array.from(currentLine.endPoint);
+
+			// draw as the ox plows
+			if (currentLine.direction == Line.directions.horizontal) {
+				// check if pen is already at the same x as end of the line (in screen space)
+				if (penPosition[0] == lineEnd[0]) {
+					// flip line start and end to avoid uneccessary movement
+					[lineStart, lineEnd] = [lineEnd, lineStart]
+				}
+			}
+			// TODO: vertical lines are a little wonky rn, fix that before being able to draw vertical lines as the ox plows
+			/*else if (currentLine.direction == Line.directions.vertical) {
+				// check if pen is already at the same y as end of the line (in screen space)
+				if (penPosition[1] == lineEnd[1]) {
+					// flip line start and end to avoid uneccessary movement
+					[lineStart, lineEnd] = [lineEnd, lineStart]
+				}
+			}*/
+
+
+			// remember pen position (screen space)
+			penPosition = Array.from(lineEnd);
 
 			// convert to physical size
 			lineStart[0] *= proportions[0];
