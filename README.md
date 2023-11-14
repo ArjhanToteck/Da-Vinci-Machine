@@ -2,7 +2,7 @@
 
 I remember seeing some TikTok a while ago where a dude stuck a pen to his printer and made it write an essay with Chat GPT or something. It's a cool idea, but if I did that, I wouldn't be publishing it on GitHub for my school to see and then suspend me or something. Instead, I only borrowed the concept of attatching a pen to my 3D printer and thought it'd be cool to draw some stuff.
 
-This repository contains a tool written in HTML and JS to convert image files into .gcode instructions for a 3D printer.
+This repository contains a tool written in HTML and JS to convert image files into .gcode instructions for a 3D printer. I know it's unoptimized spaghetti, but I wrote 90% of it in the span of two school nights when I should've been studying for my calculus test. Sue me.
 
 # How to use
 
