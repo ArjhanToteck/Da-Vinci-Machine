@@ -508,9 +508,9 @@
 		// set other input to be proportional
 		if (proportionConstraintInput.checked) {
 			if (inputBox.id == physicalWidthInput.id) {
-				physicalHeightInput.value = parseFloat(physicalHeightInput.value) * (image.height / image.width);
+				physicalHeightInput.value = parseFloat(physicalWidthInput.value) * (image.height / image.width);
 			} else {
-				physicalWidthInput.value = parseFloat(physicalWidthInput.value) * (image.width / image.height);
+				physicalWidthInput.value = parseFloat(physicalHeightInput.value) * (image.width / image.height);
 			}
 		}
 	}
