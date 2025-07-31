@@ -10,7 +10,7 @@ This program takes an image and divides it into rectangles. It then gets the ave
 
 Here's an illustration of this proccess with an actual drawing made from this program: 
 
-![The 4 main steps are shown, being the original image, a grid division, a digital line drawing, and a physical drawing.](example.png)
+![The 4 main steps are shown, being the original image, a grid division, a digital line drawing, and a physical drawing.](public/thumbnail.png)
 
 # How to use
 
