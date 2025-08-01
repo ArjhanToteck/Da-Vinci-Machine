@@ -9,16 +9,26 @@ export default function LineDrawing({ image, rows, columns, setPage }) {
 	const [useHorizontalLines, setUseHorizontalLines] = useState(true);
 	const [useVerticalLines, setUseVerticalLines] = useState(true);
 
+	// image processing data
+	const [cellBrightnesses, setCellBrightnesses] = useState([]);
+	const [brightestValue, setBrightestValue] = useState(1);
+	const [darkestValue, setDarkestValue] = useState(0);
+
 	const canvasRef = useRef(null);
 
 	useEffect(() => {
+		drawLines();
+	}, [minLineDensity, maxLineDensity, useHorizontalLines, useVerticalLines]);
+
+	function drawLines() {
+		// TODO: this can be optimized by not calculating brightnesses every time but im too lazy rn lol
+
 		// we need the canvas and image to do processing
 		if (!image || !canvasRef.current) {
 			return;
 		}
 
 		// use canvas to split image into cells and calculate their brightness
-
 		const canvas = canvasRef.current;
 		const context = canvas.getContext("2d");
 
@@ -29,14 +39,12 @@ export default function LineDrawing({ image, rows, columns, setPage }) {
 		const cellHeight = image.height / rows;
 		const cellWidth = image.width / columns;
 
-		// brightness variables
-		let cellBrightnesses = [];
+		let cellBrightness = [];
 		let brightestValue = 1;
 		let darkestValue = 0;
 
 		// loop through every grid cell
 		for (let y = 0; y < rows; y++) {
-			// push to start new row
 			cellBrightnesses.push([])
 
 			for (let x = 0; x < columns; x++) {
@@ -71,41 +79,96 @@ export default function LineDrawing({ image, rows, columns, setPage }) {
 					darkestValue = cellBrightness;
 				}
 
-				// add cell to row
 				cellBrightnesses[y].push(cellBrightness);
 			}
 		}
 
-		// TODO: use these to draw
-		console.log(cellBrightnesses);
+		// clear canvas for drawing
+		context.clearRect(0, 0, canvas.width, canvas.height);
 
+		// draw cells
+		for (let y = 0; y < rows; y++) {
 
-	}, [image, rows, columns]);
+			for (let x = 0; x < columns; x++) {
+				// scale brightness by factors of brightest and darkest values
+				let scaledBrightness = cellBrightnesses[y][x];
+
+				// check for all values being the same
+				if (darkestValue == brightestValue) {
+					scaledBrightness = 0.5;
+				} else {
+					// scale to a number of lines
+					scaledBrightness = (scaledBrightness - brightestValue) / (darkestValue - brightestValue);
+				}
+
+				// translate brightness to number of lines
+				let cellLineCount = Math.round((scaledBrightness * (maxLineDensity - minLineDensity)) + minLineDensity);
+
+				// draw lines in cell
+
+				// calculate line distance
+				let lineDistance = cellWidth / cellLineCount;
+
+				// loop through lines
+				for (let i = 0; i < cellLineCount; i++) {
+					// draw lines
+
+					// horizontal
+					if (useHorizontalLines) {
+						// create line
+						const startPoint = [x * cellWidth, (i * lineDistance) + (y * cellHeight)];
+						const endPoint = [(x * cellWidth) + cellWidth, (i * lineDistance) + (y * cellHeight)];
+
+						// draw line
+						context.beginPath();
+						context.moveTo(...startPoint);
+						context.lineTo(...endPoint);
+						context.stroke();
+					}
+
+					// vertical
+					if (useVerticalLines) {
+						// create line
+						const startPoint = [(i * lineDistance) + (x * cellWidth), y * cellHeight];
+						const endPoint = [(i * lineDistance) + (x * cellWidth), (y * cellHeight) + cellHeight];
+
+						// draw line
+						context.beginPath();
+						context.moveTo(...startPoint);
+						context.lineTo(...endPoint);
+						context.stroke();
+					}
+				}
+			}
+		}
+	}
 
 	return (
 		<section>
 
 			<p>Play with these settings to change the quality and contrast of the image, which is previewed below.</p>
 
-			<p>
-				Minimum line density: &nbsp;
-				<input type="number" size="7" value={minLineDensity} onChange={(event) => setMinLineDensity(parseInt(event.target.value, 10))} />
-			</p>
-			<p>
-				Maximum line density: &nbsp;
-				<input type="number" size="7" value={maxLineDensity} onChange={(event) => setMaxLineDensity(parseInt(event.target.value, 10))} />
-			</p>
-			<p>
-				Horizontal lines: &nbsp;
-				<input type="checkbox" checked={useHorizontalLines} onChange={(e) => setUseHorizontalLines(e.target.checked)} />
+			<div>
+				<p>
+					Minimum line density: &nbsp;
+					<input type="number" size="7" value={minLineDensity} onChange={(event) => setMinLineDensity(parseInt(event.target.value, 10))} />
+				</p>
+				<p>
+					Maximum line density: &nbsp;
+					<input type="number" size="7" value={maxLineDensity} onChange={(event) => setMaxLineDensity(parseInt(event.target.value, 10))} />
+				</p>
+				<p>
+					Horizontal lines: &nbsp;
+					<input type="checkbox" checked={useHorizontalLines} onChange={(e) => setUseHorizontalLines(e.target.checked)} />
 
-				<br />
+					<br />
 
-				Vertical lines: &nbsp;
-				<input type="checkbox" checked={useVerticalLines} onChange={(e) => setUseVerticalLines(e.target.checked)} />
-			</p>
+					Vertical lines: &nbsp;
+					<input type="checkbox" checked={useVerticalLines} onChange={(e) => setUseVerticalLines(e.target.checked)} />
+				</p>
+			</div>
 
-			<canvas ref={canvasRef} width={image.width} height={image.height} style={{ display: "none" }} />
+			<canvas className="round" style={{ backgroundColor: "white" }} ref={canvasRef} width={image.width} height={image.height} />
 
 			<br />
 			<button onClick={() => setPage("dimensions")}>Next</button>
@@ -116,4 +179,3 @@ export default function LineDrawing({ image, rows, columns, setPage }) {
 		</section>
 	);
 }
-

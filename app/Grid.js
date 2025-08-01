@@ -43,8 +43,8 @@ export default function Grid({ image, rows, columns, setRows, setColumns, setPag
 								stroke="var(--textAccentColor)"
 								x1={0}
 								x2={image.width}
-								y1={(image.height / (rows + 1)) * (i + 1)}
-								y2={(image.height / (rows + 1)) * (i + 1)}
+								y1={(image.height / rows) * i}
+								y2={(image.height / rows) * i}
 							/>
 						))
 					}
@@ -56,8 +56,8 @@ export default function Grid({ image, rows, columns, setRows, setColumns, setPag
 								stroke="var(--textAccentColor)"
 								y1={0}
 								y2={image.height}
-								x1={(image.width / (columns + 1)) * (i + 1)}
-								x2={(image.width / (columns + 1)) * (i + 1)}
+								x1={(image.width / columns) * i}
+								x2={(image.width / columns) * i}
 							/>
 						))}
 				</svg>
