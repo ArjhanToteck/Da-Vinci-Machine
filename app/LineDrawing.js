@@ -277,7 +277,6 @@ export default function LineDrawing({ image, rows, columns, setPage, minLineDens
 
 					// save the new combined line we created
 					combinedLines.push(combinedLine);
-					console.log("vertical line added2");
 				}
 			}
 		}

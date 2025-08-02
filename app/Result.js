@@ -11,6 +11,7 @@ export default function Result({ setPage, linesData, physicalDrawingSize, image,
 
 	useEffect(() => {
 		let newLinesGcode = "";
+		let newLinesData = [...linesData];
 
 		const proportions = [
 			physicalDrawingSize[0] / image.width,
@@ -20,54 +21,56 @@ export default function Result({ setPage, linesData, physicalDrawingSize, image,
 		let penPosition = [0, 0];
 
 		for (let i = 0; i < linesData.length; i++) {
-			const line = linesData[i];
+			const line = newLinesData[i];
+			let startPoint = [...line.startPoint];
+			let endPoint = [...line.endPoint];
 
 			// scale to physical proportions
-			line.startPoint[0] *= proportions[0];
-			line.startPoint[1] *= proportions[1];
-			line.endPoint[0] *= proportions[0];
-			line.endPoint[1] *= proportions[1];
+			startPoint[0] *= proportions[0];
+			startPoint[1] *= proportions[1];
+			endPoint[0] *= proportions[0];
+			endPoint[1] *= proportions[1];
 
 			// invert y axis on both points (convert from quadrant IV to quadrant I)
-			line.startPoint[1] = physicalDrawingSize[1] - line.startPoint[1];
-			line.endPoint[1] = physicalDrawingSize[1] - line.endPoint[1];
+			startPoint[1] = physicalDrawingSize[1] - startPoint[1];
+			endPoint[1] = physicalDrawingSize[1] - endPoint[1];
 
 			// add offset to x and y
-			line.startPoint[0] += offset[0];
-			line.startPoint[1] += offset[1];
-			line.endPoint[0] += offset[0];
-			line.endPoint[1] += offset[1];
+			startPoint[0] += offset[0];
+			startPoint[1] += offset[1];
+			endPoint[0] += offset[0];
+			endPoint[1] += offset[1];
 
 			// round to one decimal point
-			line.startPoint[0] = line.startPoint[0].toFixed(1);
-			line.startPoint[1] = line.startPoint[1].toFixed(1);
-			line.endPoint[0] = line.endPoint[0].toFixed(1);
-			line.endPoint[1] = line.endPoint[1].toFixed(1);
+			startPoint[0] = startPoint[0].toFixed(1);
+			startPoint[1] = startPoint[1].toFixed(1);
+			endPoint[0] = endPoint[0].toFixed(1);
+			endPoint[1] = endPoint[1].toFixed(1);
 
 			// set to draw as the ox plows
 
-			// check whether line.endPoint is closer to pen than line.startPoint (skip this the first time)
-			if (i != 0 && pointDistance(penPosition, line.endPoint) < pointDistance(penPosition, line.startPoint)) {
+			// check whether endPoint is closer to pen than startPoint (skip this the first time)
+			if (i != 0 && pointDistance(penPosition, endPoint) < pointDistance(penPosition, startPoint)) {
 				// flip line start and end to avoid unnecessary movement
-				[line.startPoint, line.endPoint] = [line.endPoint, line.startPoint];
+				[startPoint, endPoint] = [endPoint, startPoint];
 			}
 
 			// actually draw line
 
 			// lift pen (with z offset)
-			newLinesGcode += `G0 Z${(5 + offset[2]).toFixed(1)}; lift pen\n`;
+			newLinesGcode += `G0 Z${(5 + offset[2]).toFixed(1)}\n`;
 
 			// go to line start
-			newLinesGcode += `G0 X${line.startPoint[0]} Y${line.startPoint[1]}; start line\n`;
+			newLinesGcode += `G0 X${startPoint[0]} Y${startPoint[1]}\n`;
 
 			// lower pen (with z offset)
-			newLinesGcode += `G0 Z${(0 + offset[2]).toFixed(1)}; lower pen\n`;
+			newLinesGcode += `G0 Z${(0 + offset[2]).toFixed(1)}\n`;
 
 			// go to line end
-			newLinesGcode += `G0 X${line.endPoint[0]} Y${line.endPoint[1]}; end line\n\n`;
+			newLinesGcode += `G0 X${endPoint[0]} Y${endPoint[1]}\n\n`;
 
 			// remember pen position for next line
-			penPosition = line.endPoint;
+			penPosition = endPoint;
 		}
 
 		setLinesGcode(newLinesGcode);
