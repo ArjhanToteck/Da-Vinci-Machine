@@ -13,7 +13,7 @@ export default function Home({ image, setImage, setPage }) {
 				</p>
 
 				<p>
-					This converts image files into .gcode instructions for a 3D printer. I wrote 90% of it in the span of two school nights when I should've been studying for my calculus test.
+					This converts image files into .gcode instructions for a 3D printer. I wrote most of it in the span of two school nights when I should've been studying for my calculus test.
 				</p>
 
 				<p>

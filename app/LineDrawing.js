@@ -2,13 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-export default function LineDrawing({ image, rows, columns, setPage }) {
-	// drawing settings
-	const [minLineDensity, setMinLineDensity] = useState(0);
-	const [maxLineDensity, setMaxLineDensity] = useState(4);
-	const [useHorizontalLines, setUseHorizontalLines] = useState(true);
-	const [useVerticalLines, setUseVerticalLines] = useState(true);
-
+export default function LineDrawing({ image, rows, columns, setPage, minLineDensity, setMinLineDensity, maxLineDensity, setMaxLineDensity, useHorizontalLines, setUseHorizontalLines, useVerticalLines, setUseVerticalLines }) {
 	// image processing data
 	const [cellBrightnesses, setCellBrightnesses] = useState([]);
 	const [brightestValue, setBrightestValue] = useState(1);
@@ -112,6 +106,8 @@ export default function LineDrawing({ image, rows, columns, setPage }) {
 				// loop through lines
 				for (let i = 0; i < cellLineCount; i++) {
 					// draw lines
+
+					// TODO: maybe we can do better contrast/range by not always having the same number of vertical and horizontal lines
 
 					// horizontal
 					if (useHorizontalLines) {
