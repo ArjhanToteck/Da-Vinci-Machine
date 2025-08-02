@@ -151,11 +151,11 @@ export default function LineDrawing({ image, rows, columns, setPage }) {
 			<div>
 				<p>
 					Minimum line density: &nbsp;
-					<input type="number" size="7" value={minLineDensity} onChange={(event) => setMinLineDensity(parseInt(event.target.value, 10))} />
+					<input type="number" value={minLineDensity} onChange={(event) => setMinLineDensity(parseInt(event.target.value, 10))} />
 				</p>
 				<p>
 					Maximum line density: &nbsp;
-					<input type="number" size="7" value={maxLineDensity} onChange={(event) => setMaxLineDensity(parseInt(event.target.value, 10))} />
+					<input type="number" value={maxLineDensity} onChange={(event) => setMaxLineDensity(parseInt(event.target.value, 10))} />
 				</p>
 				<p>
 					Horizontal lines: &nbsp;

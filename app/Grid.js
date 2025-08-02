@@ -8,11 +8,11 @@ export default function Grid({ image, rows, columns, setRows, setColumns, setPag
 
 			<p>
 				Rows: &nbsp;
-				<input type="number" size="7" value={rows} onChange={(event) => setRows(parseInt(event.target.value, 10))} />
+				<input type="number" value={rows} onChange={(event) => setRows(parseInt(event.target.value, 10))} />
 			</p>
 			<p>
 				Columns: &nbsp;
-				<input type="number" size="7" value={columns} onChange={(event) => setColumns(parseInt(event.target.value, 10))} />
+				<input type="number" value={columns} onChange={(event) => setColumns(parseInt(event.target.value, 10))} />
 			</p>
 
 			<div style={{ position: "relative", width: image.width, height: image.height }}>
