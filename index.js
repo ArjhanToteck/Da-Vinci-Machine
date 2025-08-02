@@ -34,7 +34,7 @@ let rows = 0;
 let columns = 0;
 let verticalLinesData = [];
 let horizontalLinesData = [];
-let combinedLinesData = [];
+let combinedLines = [];
 let physicalSize = [];
 let gcodeFile = ``;
 
@@ -100,7 +100,7 @@ function generateLines() {
 	// clear line data
 	verticalLinesData = [];
 	horizontalLinesData = [];
-	combinedLinesData = [];
+	combinedLines = [];
 
 	// draw image on canvas for processing
 	context.drawImage(image, 0, 0, image.width, image.height);
@@ -258,7 +258,7 @@ function submitLines() {
 
 function combineLines() {
 	// clear combined lines data
-	combinedLinesData = [];
+	combinedLines = [];
 
 	// horizontal lines
 
@@ -310,7 +310,7 @@ function combineLines() {
 				}
 
 				// save the new combined line we created
-				combinedLinesData.push(combinedLine);
+				combinedLines.push(combinedLine);
 			}
 		}
 	}
@@ -365,7 +365,7 @@ function combineLines() {
 				}
 
 				// save the new combined line we created
-				combinedLinesData.push(combinedLine);
+				combinedLines.push(combinedLine);
 			}
 		}
 	}
@@ -422,8 +422,8 @@ function generateGcode() {
 	let penPosition = [0, 0];
 
 	// loop through lines
-	for (let i = 0; i < combinedLinesData.length; i++) {
-		let currentLine = combinedLinesData[i];
+	for (let i = 0; i < combinedLines.length; i++) {
+		let currentLine = combinedLines[i];
 
 		// get line points
 		let lineStart = Array.from(currentLine.startPoint);

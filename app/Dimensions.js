@@ -24,11 +24,11 @@ export default function Dimensions({ setPage, physicalDrawingSize, setPhysicalDr
 			<p>Finally, enter the physical dimensions of the image you want to draw. There is also an option for an offset, which is useful if your pen is not perfectly under the nozzle. Measure the distance from the tip of the nozzle to the tip of the pen in mm to calibrate for this difference.</p>
 			<p>
 				Physical drawing width (mm): &nbsp;
-				<input type="number" size="7" value={physicalDrawingSize[0]} onChange={(event) => changePhysicalSize(0, parseInt(event.target.value, 10))} />
+				<input type="number" size="7" value={physicalDrawingSize[0]} onChange={(event) => changePhysicalSize(0, parseFloat(event.target.value))} />
 			</p>
 			<p>
 				Physical drawing height (mm): &nbsp;
-				<input type="number" size="7" value={physicalDrawingSize[1]} onChange={(event) => changePhysicalSize(1, parseInt(event.target.value, 10))} />
+				<input type="number" size="7" value={physicalDrawingSize[1]} onChange={(event) => changePhysicalSize(1, parseFloat(event.target.value))} />
 			</p>
 			<p>
 				Lock proportion: &nbsp;
@@ -37,11 +37,16 @@ export default function Dimensions({ setPage, physicalDrawingSize, setPhysicalDr
 			<p>
 
 				Offset (mm): &nbsp;
-				<input type="number" style={{ width: "5em" }} value={offset[0]} onChange={(event) => changeOffset(0, parseInt(event.target.value, 10))} />
+
+				<input placeholder="x" type="number" style={{ width: "5em" }} value={offset[0]} onChange={(event) => changeOffset(0, parseFloat(event.target.value))} />
+
 				&nbsp; &nbsp;
-				<input type="number" style={{ width: "5em" }} value={offset[1]} onChange={(event) => changeOffset(1, parseInt(event.target.value, 10))} />
+
+				<input placeholder="y" type="number" style={{ width: "5em" }} value={offset[1]} onChange={(event) => changeOffset(1, parseFloat(event.target.value))} />
+
 				&nbsp; &nbsp;
-				<input type="number" style={{ width: "5em" }} value={offset[2]} onChange={(event) => changeOffset(2, parseInt(event.target.value, 10))} />
+
+				<input placeholder="z" type="number" style={{ width: "5em" }} value={offset[2]} onChange={(event) => changeOffset(2, parseFloat(event.target.value))} />
 			</p>
 
 			<br />
@@ -78,7 +83,6 @@ export default function Dimensions({ setPage, physicalDrawingSize, setPhysicalDr
 
 			// apply proportion to other dimension
 			newPhysicalDrawingSize[oppositeIndex] = newPhysicalDrawingSize[index] * proportion;
-			console.log(newPhysicalDrawingSize);
 		}
 
 		// set state

@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
+import LineData from './LineData';
 
-export default function LineDrawing({ image, rows, columns, setPage, minLineDensity, setMinLineDensity, maxLineDensity, setMaxLineDensity, useHorizontalLines, setUseHorizontalLines, useVerticalLines, setUseVerticalLines }) {
+export default function LineDrawing({ image, rows, columns, setPage, minLineDensity, setMinLineDensity, maxLineDensity, setMaxLineDensity, useHorizontalLines, setUseHorizontalLines, useVerticalLines, setUseVerticalLines, setLinesData }) {
 	// image processing data
 	const [cellBrightnesses, setCellBrightnesses] = useState([]);
 	const [brightestValue, setBrightestValue] = useState(1);
@@ -80,10 +81,23 @@ export default function LineDrawing({ image, rows, columns, setPage, minLineDens
 		// clear canvas for drawing
 		context.clearRect(0, 0, canvas.width, canvas.height);
 
-		// draw cells
-		for (let y = 0; y < rows; y++) {
+		let horizontalLines = [];
+		let verticalLines = [];
 
+		// draw cells
+
+		// loop through rows
+		for (let y = 0; y < rows; y++) {
+			// create new row for line data
+			horizontalLines.push([]);
+			verticalLines.push([]);
+
+			// loop through columns
 			for (let x = 0; x < columns; x++) {
+				// create new cell for line data
+				horizontalLines[y].push([]);
+				verticalLines[y].push([]);
+
 				// scale brightness by factors of brightest and darkest values
 				let scaledBrightness = cellBrightnesses[y][x];
 
@@ -112,8 +126,18 @@ export default function LineDrawing({ image, rows, columns, setPage, minLineDens
 					// horizontal
 					if (useHorizontalLines) {
 						// create line
-						const startPoint = [x * cellWidth, (i * lineDistance) + (y * cellHeight)];
-						const endPoint = [(x * cellWidth) + cellWidth, (i * lineDistance) + (y * cellHeight)];
+						const startPoint = [
+							x * cellWidth,
+							(i * lineDistance) + (y * cellHeight)
+						];
+
+						const endPoint = [
+							(x * cellWidth) + cellWidth,
+							(i * lineDistance) + (y * cellHeight)
+						];
+
+						// add line to data
+						horizontalLines[y][x].push(new LineData(startPoint, endPoint, LineData.Direction.horizontal));
 
 						// draw line
 						context.beginPath();
@@ -125,8 +149,18 @@ export default function LineDrawing({ image, rows, columns, setPage, minLineDens
 					// vertical
 					if (useVerticalLines) {
 						// create line
-						const startPoint = [(i * lineDistance) + (x * cellWidth), y * cellHeight];
-						const endPoint = [(i * lineDistance) + (x * cellWidth), (y * cellHeight) + cellHeight];
+						const startPoint = [
+							(i * lineDistance) + (x * cellWidth),
+							y * cellHeight
+						];
+
+						const endPoint = [
+							(i * lineDistance) + (x * cellWidth),
+							(y * cellHeight) + cellHeight
+						];
+
+						// add line to data
+						verticalLines[y][x].push(new LineData(startPoint, endPoint, LineData.Direction.horizontal));
 
 						// draw line
 						context.beginPath();
@@ -137,6 +171,118 @@ export default function LineDrawing({ image, rows, columns, setPage, minLineDens
 				}
 			}
 		}
+
+		// combine redundant cells
+
+		// clear combined lines data
+		let combinedLines = [];
+
+		// loop through cells
+		for (let y = 0; y < rows; y++) {
+			for (let x = 0; x < columns; x++) {
+
+				// horizontal lines
+
+				// loop through horizontal lines
+				for (let lineIndex = 0; lineIndex < horizontalLines[y][x].length; lineIndex++) {
+					let line = horizontalLines[y][x][lineIndex];
+
+					// skip lines already marked as checked for possible combinations
+					if (line.combinationsChecked) {
+						continue;
+					}
+
+					// marks like as checked for combinations
+					line.combinationsChecked = true;
+
+					let combinedLine = new LineData(Array.from(line.startPoint), Array.from(line.endPoint), LineData.Direction.horizontal, true);
+
+					// loop through cells to the right
+					for (let cellToRight = x + 1; cellToRight < horizontalLines[y].length; cellToRight++) {
+						let matchFound = false;
+
+						// loop through lines
+						for (let lineToRightIndex = 0; lineToRightIndex < horizontalLines[y][cellToRight].length; lineToRightIndex++) {
+
+							let lineToRight = horizontalLines[y][cellToRight][lineToRightIndex];
+
+							// check if y positions match (x positions must fit if in cell to right)
+							if (line.startPoint[1] == lineToRight.startPoint[1]) {
+								combinedLine.endPoint[0] = lineToRight.endPoint[0];
+
+								// marks line as checked for combinations
+								lineToRight.combinationsChecked = true;
+
+								// we can skip to the next cell now that we found a match
+								matchFound = true;
+								break;
+							}
+						}
+
+						// if there aren't any matches in this cell, we can stop looking through cells on the right
+						if (!matchFound) {
+							cellToRight = horizontalLines[y].length;
+							break;
+						}
+					}
+
+					// save the new combined line we created
+					combinedLines.push(combinedLine);
+				}
+
+				// vertical lines
+
+				// loop through vertical lines
+				for (let lineIndex = 0; lineIndex < verticalLines[y][x].length; lineIndex++) {
+					let line = verticalLines[y][x][lineIndex];
+
+					// skip lines already marked as checked for possible combinations
+					if (line.combinationsChecked) {
+						continue;
+					}
+
+					// marks like as checked for combinations
+					line.combinationsChecked = true;
+
+					let combinedLine = new LineData(Array.from(line.startPoint), Array.from(line.endPoint), LineData.Direction.vertical, true);
+
+					// loop through cells below
+					for (let cellBelow = y + 1; cellBelow < rows; cellBelow++) {
+						let matchFound = false;
+
+						// loop through lines
+						for (let lineBelowIndex = 0; lineBelowIndex < verticalLines[cellBelow][x].length; lineBelowIndex++) {
+
+							let lineBelow = verticalLines[cellBelow][x][lineBelowIndex];
+
+							// check if y positions match (x positions must fit if in cell to right)
+							if (line.startPoint[0] == lineBelow.startPoint[0]) {
+								combinedLine.endPoint[1] = lineBelow.endPoint[1];
+
+								// marks line as checked for combinations
+								lineBelow.combinationsChecked = true;
+
+								// we can skip to the next cell now that we found a match
+								matchFound = true;
+								break;
+							}
+						}
+
+						// if there aren't any matches in this cell, we can stop looking through cells on the right
+						if (!matchFound) {
+							cellBelow = rows;
+							break;
+						}
+					}
+
+					// save the new combined line we created
+					combinedLines.push(combinedLine);
+					console.log("vertical line added2");
+				}
+			}
+		}
+
+		setLinesData(combinedLines);
 	}
 
 	return (

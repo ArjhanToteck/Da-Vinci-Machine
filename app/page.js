@@ -10,6 +10,7 @@ import Result from "./Result";
 export default function Page() {
 	const [page, setPage] = useState("home");
 	const [image, setImage] = useState(null);
+	const [linesData, setLinesData] = useState([]);
 
 	// grid settings
 	const [rows, setRows] = useState(50);
@@ -60,6 +61,7 @@ export default function Page() {
 					setUseHorizontalLines={setUseHorizontalLines}
 					useVerticalLines={useVerticalLines}
 					setUseVerticalLines={setUseVerticalLines}
+					setLinesData={setLinesData}
 				/>
 			}
 
@@ -82,7 +84,7 @@ export default function Page() {
 			{
 				// result page
 				page == "result" &&
-				<Result setPage={setPage} />
+				<Result setPage={setPage} linesData={linesData} physicalDrawingSize={physicalDrawingSize} image={image} offset={offset} />
 			}
 		</main>
 	);
