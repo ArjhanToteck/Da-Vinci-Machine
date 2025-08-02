@@ -14,5 +14,7 @@ Here's an illustration of this proccess with an actual drawing made from this pr
 
 # How to use
 
-Just download this repository and open the `index.html` file or just go [here](https://arjhantoteck.vercel.app/da%20vinci%20machine/). Upload your image, choose your grid settings, and set the physical size of the image. Make sure to adjust the offset based on the distance between the 3D printer nozzle and the actual pen. You will probably also need to lower the Z axis a bit to make sure the lines are dark enough. When you're done, download the file and put it into your 3D printer.
+Just go [here](https://arjhantoteck.vercel.app/da%20vinci%20machine/). Upload your image, choose your grid settings, and set the physical size of the image. Make sure to adjust the offset based on the distance between the 3D printer nozzle and the actual pen. You will probably also need to lower the Z axis a bit to make sure the lines are dark enough. When you're done, download the file and put it into your 3D printer.
+
+To self-host or self-run, you will need to import the files from this repo into a Next.js project. Because this is a submodule for my website, some components, such as the codeblock, may be missing, although that can be found on the repo for my website.
 
