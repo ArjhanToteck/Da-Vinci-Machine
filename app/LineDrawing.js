@@ -195,7 +195,7 @@ export default function LineDrawing({ image, rows, columns, setPage, minLineDens
 					// marks like as checked for combinations
 					line.combinationsChecked = true;
 
-					let combinedLine = new LineData(Array.from(line.startPoint), Array.from(line.endPoint), LineData.Direction.horizontal, true);
+					let combinedLine = new LineData([...line.startPoint], [...line.endPoint], LineData.Direction.horizontal, true);
 
 					// loop through cells to the right
 					for (let cellToRight = x + 1; cellToRight < horizontalLines[y].length; cellToRight++) {
@@ -244,7 +244,7 @@ export default function LineDrawing({ image, rows, columns, setPage, minLineDens
 					// marks like as checked for combinations
 					line.combinationsChecked = true;
 
-					let combinedLine = new LineData(Array.from(line.startPoint), Array.from(line.endPoint), LineData.Direction.vertical, true);
+					let combinedLine = new LineData([...line.startPoint], [...line.endPoint], LineData.Direction.vertical, true);
 
 					// loop through cells below
 					for (let cellBelow = y + 1; cellBelow < rows; cellBelow++) {
