@@ -12,10 +12,6 @@ export default function LineDrawing({ image, rows, columns, setPage, minLineDens
 	const canvasRef = useRef(null);
 
 	useEffect(() => {
-		drawLines();
-	}, [minLineDensity, maxLineDensity, useHorizontalLines, useVerticalLines]);
-
-	function drawLines() {
 		// TODO: this can be optimized by not calculating brightnesses every time but im too lazy rn lol
 
 		// we need the canvas and image to do processing
@@ -282,7 +278,7 @@ export default function LineDrawing({ image, rows, columns, setPage, minLineDens
 		}
 
 		setLinesData(combinedLines);
-	}
+	}, [minLineDensity, maxLineDensity, useHorizontalLines, useVerticalLines, cellBrightnesses, columns, image, rows, setLinesData]);
 
 	return (
 		<section>

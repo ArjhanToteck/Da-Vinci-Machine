@@ -74,7 +74,7 @@ export default function Result({ setPage, linesData, physicalDrawingSize, image,
 		}
 
 		setLinesGcode(newLinesGcode);
-	}, []);
+	}, [image.height, image.width, linesData, offset, physicalDrawingSize]);
 
 	return (
 		<section>

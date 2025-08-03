@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 export default function Grid({ image, rows, columns, setRows, setColumns, setPage }) {
 	return (
 		<section>
@@ -16,14 +18,15 @@ export default function Grid({ image, rows, columns, setRows, setColumns, setPag
 			</p>
 
 			<div style={{ position: "relative", width: image.width, height: image.height }}>
-				<img
+				<Image
+					alt="A preview of the uploaded image with a grid drawn over it."
 					src={image.src}
+					width={image.width}
+					height={image.height}
 					style={{
 						position: "absolute",
 						top: 0,
-						left: 0,
-						width: image.width,
-						height: image.height,
+						left: 0
 					}} />
 				{/* svg grid */}
 				<svg

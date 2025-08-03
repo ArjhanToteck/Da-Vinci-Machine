@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 
 export default function Home({ image, setImage, setPage }) {
 	const [imageSrc, setImageSrc] = useState(image?.src);
+	const [imageDisplay, setImageDisplay] = useState("none");
 	const imageRef = useRef(null);
 
 	return (
@@ -37,41 +38,46 @@ export default function Home({ image, setImage, setPage }) {
 
 		</section>
 	);
-}
-
-function uploadImage(event, setImageSrc) {
-	// get file upload
-	const file = event.target.files[0];
-
-	// make sure it's an image
-	if (file && file.type.startsWith("image/")) {
-		// store image for later use
-		setImageSrc(URL.createObjectURL(file));
-	} else {
-		// TODO: catch non image
-	}
-}
 
 
-function UploadPreview({ imageRef, imageSrc, setImage }) {
-	return (
-		<img src={imageSrc} ref={imageRef} onLoad={onLoad} style={{
-			maxWidth: "50%",
-			maxHeight: "30vh",
-			objectFit: "contain",
-		}} />
-	);
+	function UploadPreview({ imageRef, imageSrc, setImage }) {
+		return (
+			<img src={imageSrc} ref={imageRef} onLoad={onLoad} alt="A preview of the uploaded image." style={{
+				maxWidth: "50%",
+				maxHeight: "30vh",
+				objectFit: "contain",
+				display: imageDisplay
+			}} />
+		);
 
-	function onLoad() {
-		// only need this if we're gonna set the dimensions
-		if (!setImage) {
-			return;
+		function onLoad() {
+			// only need this if we're gonna set the dimensions
+			if (!setImage) {
+				return;
+			}
+
+			// create a copy of the image to store as a variable (for some reason storing the real element makes the dimensions change)
+			const newImage = new Image(imageRef.current.width, imageRef.current.height);
+			newImage.src = imageRef.current.src;
+
+			setImage(newImage);
 		}
+	}
 
-		// create a copy of the image to store as a variable (for some reason storing the real element makes the dimensions change)
-		const newImage = new Image(imageRef.current.width, imageRef.current.height);
-		newImage.src = imageRef.current.src;
+	function uploadImage(event, setImageSrc) {
 
-		setImage(newImage);
+		// get file upload
+		const file = event.target.files[0];
+
+		// make sure it's an image
+		if (file && file.type.startsWith("image/")) {
+			// show image
+			setImageDisplay("inline");
+
+			// store image for later use
+			setImageSrc(URL.createObjectURL(file));
+		} else {
+			// TODO: catch non image
+		}
 	}
 }
