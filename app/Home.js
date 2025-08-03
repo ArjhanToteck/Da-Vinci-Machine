@@ -1,9 +1,10 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import NextImage from "next/image";
 
 export default function Home({ image, setImage, setPage }) {
 	const [imageSrc, setImageSrc] = useState(image?.src);
 	const imageRef = useRef(null);
+	const [imageLoaded, setImageLoaded] = useState(false);
 
 	return (
 		<section>
@@ -45,6 +46,29 @@ export default function Home({ image, setImage, setPage }) {
 			return null;
 		}
 
+		const onLoad = useCallback(() => {
+			// onload keeps getting called, it's a thing with NextImage
+			if (imageLoaded) {
+				return;
+			}
+
+			setImageLoaded(true);
+
+			// only need this if we're gonna set the dimensions
+			if (!setImage) {
+				return;
+			}
+
+			// get dimensions of image
+			const rect = imageRef.current.getBoundingClientRect();
+
+			// create a copy of the image to store as a variable (for some reason storing the real element makes the dimensions change)
+			const newImage = new Image(rect.width, rect.height);
+			newImage.src = imageRef.current.src;
+
+			setImage(newImage);
+		});
+
 		return (
 			<NextImage
 				src={imageSrc}
@@ -61,22 +85,6 @@ export default function Home({ image, setImage, setPage }) {
 				}}
 			/>
 		);
-
-		function onLoad() {
-			// only need this if we're gonna set the dimensions
-			if (!setImage) {
-				return;
-			}
-
-			// get dimensions of image
-			const rect = imageRef.current.getBoundingClientRect();
-
-			// create a copy of the image to store as a variable (for some reason storing the real element makes the dimensions change)
-			const newImage = new Image(rect.width, rect.height);
-			newImage.src = imageRef.current.src;
-
-			setImage(newImage);
-		}
 	}
 
 	function uploadImage(event, setImageSrc) {
