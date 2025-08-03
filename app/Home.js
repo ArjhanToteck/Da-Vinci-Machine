@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
+import NextImage from "next/image";
 
 export default function Home({ image, setImage, setPage }) {
 	const [imageSrc, setImageSrc] = useState(image?.src);
-	const [imageDisplay, setImageDisplay] = useState("none");
 	const imageRef = useRef(null);
 
 	return (
@@ -41,13 +41,25 @@ export default function Home({ image, setImage, setPage }) {
 
 
 	function UploadPreview({ imageRef, imageSrc, setImage }) {
+		if (imageSrc == null) {
+			return null;
+		}
+
 		return (
-			<img src={imageSrc} ref={imageRef} onLoad={onLoad} alt="A preview of the uploaded image." style={{
-				maxWidth: "50%",
-				maxHeight: "30vh",
-				objectFit: "contain",
-				display: imageDisplay
-			}} />
+			<NextImage
+				src={imageSrc}
+				alt="Uploaded preview"
+				width={1} // dummy value
+				height={1} // dummy value
+				onLoad={onLoad}
+				ref={imageRef}
+				style={{
+					width: "50%",
+					maxHeight: "30vh",
+					height: "auto",
+					objectFit: "contain"
+				}}
+			/>
 		);
 
 		function onLoad() {
@@ -56,8 +68,11 @@ export default function Home({ image, setImage, setPage }) {
 				return;
 			}
 
+			// get dimensions of image
+			const rect = imageRef.current.getBoundingClientRect();
+
 			// create a copy of the image to store as a variable (for some reason storing the real element makes the dimensions change)
-			const newImage = new Image(imageRef.current.width, imageRef.current.height);
+			const newImage = new Image(rect.width, rect.height);
 			newImage.src = imageRef.current.src;
 
 			setImage(newImage);
@@ -71,9 +86,6 @@ export default function Home({ image, setImage, setPage }) {
 
 		// make sure it's an image
 		if (file && file.type.startsWith("image/")) {
-			// show image
-			setImageDisplay("inline");
-
 			// store image for later use
 			setImageSrc(URL.createObjectURL(file));
 		} else {
