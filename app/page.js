@@ -29,7 +29,10 @@ export default function Page() {
 
 	return (
 		<main>
-			<h1>da Vinci Machine</h1>
+			<section>
+				<h1>da Vinci Machine</h1>
+			</section>
+
 			{
 				// home page
 				page == "home" &&
